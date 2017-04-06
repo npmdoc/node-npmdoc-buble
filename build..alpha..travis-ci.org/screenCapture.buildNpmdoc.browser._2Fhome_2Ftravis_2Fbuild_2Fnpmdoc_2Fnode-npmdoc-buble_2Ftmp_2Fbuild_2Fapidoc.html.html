@@ -1,0 +1,202 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://gitlab.com/Rich-Harris/buble#README">buble (v0.15.2)</a>
+</h1>
+<h4>The blazing fast, batteries-included ES2015 compiler</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.buble">module buble</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.buble.target">
+            function <span class="apidocSignatureSpan">buble.</span>target
+            <span class="apidocSignatureSpan">( target )</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.buble.transform">
+            function <span class="apidocSignatureSpan">buble.</span>transform
+            <span class="apidocSignatureSpan">( source, options )</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">string <span class="apidocSignatureSpan">buble.</span>VERSION</span>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.buble" id="apidoc.module.buble">module buble</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.buble.target" id="apidoc.element.buble.target">
+        function <span class="apidocSignatureSpan">buble.</span>target
+        <span class="apidocSignatureSpan">( target )</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function target( target ) {
+	var targets = Object.keys( target );
+	var bitmask = targets.length ?
+		2147483647 :
+		1073741824;
+
+	Object.keys( target ).forEach( function ( environment ) {
+		var versions = matrix[ environment ];
+		if ( !versions ) throw new Error( ("Unknown environment '" + environment + "'. Please raise an issue at https://gitlab.com/Rich
+-Harris/buble/issues") );
+
+		var targetVersion = target[ environment ];
+		if ( !( targetVersion in versions ) ) throw new Error( ("Support data exists for the following versions of " + environment + ": " + (
+Object.keys( versions ).join( ', ')) + ". Please raise an issue at https://gitlab.com/Rich-Harris/buble/issues") );
+		var support = versions[ targetVersion ];
+
+		bitmask &amp;= support;
+	});
+
+	var transforms = Object.create( null );
+	features.forEach( function ( name, i ) {
+		transforms[ name ] = !( bitmask &amp; 1 &lt;&lt; i );
+	});
+
+	dangerousTransforms.forEach( function ( name ) {
+		transforms[ name ] = false;
+	});
+
+	return transforms;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.buble.transform" id="apidoc.element.buble.transform">
+        function <span class="apidocSignatureSpan">buble.</span>transform
+        <span class="apidocSignatureSpan">( source, options )</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function transform( source, options ) {
+	if ( options === void 0 ) options = {};
+
+	var ast;
+
+	try {
+		ast = parse( source, {
+			ecmaVersion: 7,
+			preserveParens: true,
+			sourceType: 'module',
+			plugins: {
+				jsx: true,
+				objectSpread: true
+			}
+		});
+	} catch ( err ) {
+		err.snippet = getSnippet( source, err.loc );
+		err.toString = function () { return ((err.name) + ": " + (err.message) + "\n" + (err.snippet)); };
+		throw err;
+	}
+
+	var transforms = target( options.target || {} );
+	Object.keys( options.transforms || {} ).forEach( function ( name ) {
+		if ( name === 'modules' ) {
+			if ( !( 'moduleImport' in options.transforms ) ) transforms.moduleImport = options.transforms.modules;
+			if ( !( 'moduleExport' in options.transforms ) ) transforms.moduleExport = options.transforms.modules;
+			return;
+		}
+
+		if ( !( name in transforms ) ) throw new Error( ("Unknown transform '" + name + "'") );
+		transforms[ name ] = options.transforms[ name ];
+	});
+
+	return new Program( source, ast, transforms, options ).export( options );
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+buble input.js &gt; output.js
+```
+
+...or via the JavaScript API:
+
+```js
+var buble = require( 'buble' );
+var result = buble.<span class="apidocCodeKeywordSpan">transform</span>( source ); // { code: ..., map: ... }
+```
+
+
+## License
+
+MIT
+...</pre></li>
+    </ul>
+
+
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
