@@ -1,9 +1,14 @@
-# api documentation for  [buble (v0.15.2)](https://gitlab.com/Rich-Harris/buble#README)  [![npm package](https://img.shields.io/npm/v/npmdoc-buble.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-buble) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-buble.svg)](https://travis-ci.org/npmdoc/node-npmdoc-buble)
+# npmdoc-buble
+
+#### api documentation for  [buble (v0.15.2)](https://gitlab.com/Rich-Harris/buble#README)  [![npm package](https://img.shields.io/npm/v/npmdoc-buble.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-buble) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-buble.svg)](https://travis-ci.org/npmdoc/node-npmdoc-buble)
+
 #### The blazing fast, batteries-included ES2015 compiler
 
-[![NPM](https://nodei.co/npm/buble.png?downloads=true)](https://www.npmjs.com/package/buble)
+[![NPM](https://nodei.co/npm/buble.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/buble)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-buble/build/screenCapture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-buble_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-buble/build/apidoc.html)
+- [https://npmdoc.github.io/node-npmdoc-buble/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-buble/build/apidoc.html)
+
+[![apidoc](https://npmdoc.github.io/node-npmdoc-buble/build/screenCapture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-buble/build/apidoc.html)
 
 ![npmPackageListing](https://npmdoc.github.io/node-npmdoc-buble/build/screenCapture.npmPackageListing.svg)
 
@@ -80,17 +85,14 @@
     "main": "dist/buble.umd.js",
     "maintainers": [
         {
-            "name": "marijn",
-            "email": "marijnh@gmail.com"
+            "name": "marijn"
         },
         {
-            "name": "rich_harris",
-            "email": "richard.a.harris@gmail.com"
+            "name": "rich_harris"
         }
     ],
     "name": "buble",
     "optionalDependencies": {},
-    "readme": "ERROR: No README data found!",
     "repository": {
         "type": "git",
         "url": "git+https://gitlab.com/Rich-Harris/buble.git"
@@ -109,117 +111,6 @@
     },
     "version": "0.15.2"
 }
-```
-
-
-
-# <a name="apidoc.tableOfContents"></a>[table of contents](#apidoc.tableOfContents)
-
-#### [module buble](#apidoc.module.buble)
-1.  [function <span class="apidocSignatureSpan">buble.</span>target ( target )](#apidoc.element.buble.target)
-1.  [function <span class="apidocSignatureSpan">buble.</span>transform ( source, options )](#apidoc.element.buble.transform)
-1.  string <span class="apidocSignatureSpan">buble.</span>VERSION
-
-
-
-# <a name="apidoc.module.buble"></a>[module buble](#apidoc.module.buble)
-
-#### <a name="apidoc.element.buble.target"></a>[function <span class="apidocSignatureSpan">buble.</span>target ( target )](#apidoc.element.buble.target)
-- description and source-code
-```javascript
-function target( target ) {
-	var targets = Object.keys( target );
-	var bitmask = targets.length ?
-		2147483647 :
-		1073741824;
-
-	Object.keys( target ).forEach( function ( environment ) {
-		var versions = matrix[ environment ];
-		if ( !versions ) throw new Error( ("Unknown environment '" + environment + "'. Please raise an issue at https://gitlab.com/Rich
--Harris/buble/issues") );
-
-		var targetVersion = target[ environment ];
-		if ( !( targetVersion in versions ) ) throw new Error( ("Support data exists for the following versions of " + environment + ": " + (
-Object.keys( versions ).join( ', ')) + ". Please raise an issue at https://gitlab.com/Rich-Harris/buble/issues") );
-		var support = versions[ targetVersion ];
-
-		bitmask &= support;
-	});
-
-	var transforms = Object.create( null );
-	features.forEach( function ( name, i ) {
-		transforms[ name ] = !( bitmask & 1 << i );
-	});
-
-	dangerousTransforms.forEach( function ( name ) {
-		transforms[ name ] = false;
-	});
-
-	return transforms;
-}
-```
-- example usage
-```shell
-n/a
-```
-
-#### <a name="apidoc.element.buble.transform"></a>[function <span class="apidocSignatureSpan">buble.</span>transform ( source, options )](#apidoc.element.buble.transform)
-- description and source-code
-```javascript
-function transform( source, options ) {
-	if ( options === void 0 ) options = {};
-
-	var ast;
-
-	try {
-		ast = parse( source, {
-			ecmaVersion: 7,
-			preserveParens: true,
-			sourceType: 'module',
-			plugins: {
-				jsx: true,
-				objectSpread: true
-			}
-		});
-	} catch ( err ) {
-		err.snippet = getSnippet( source, err.loc );
-		err.toString = function () { return ((err.name) + ": " + (err.message) + "\n" + (err.snippet)); };
-		throw err;
-	}
-
-	var transforms = target( options.target || {} );
-	Object.keys( options.transforms || {} ).forEach( function ( name ) {
-		if ( name === 'modules' ) {
-			if ( !( 'moduleImport' in options.transforms ) ) transforms.moduleImport = options.transforms.modules;
-			if ( !( 'moduleExport' in options.transforms ) ) transforms.moduleExport = options.transforms.modules;
-			return;
-		}
-
-		if ( !( name in transforms ) ) throw new Error( ("Unknown transform '" + name + "'") );
-		transforms[ name ] = options.transforms[ name ];
-	});
-
-	return new Program( source, ast, transforms, options ).export( options );
-}
-```
-- example usage
-```shell
-...
-buble input.js > output.js
-'''
-
-...or via the JavaScript API:
-
-'''js
-var buble = require( 'buble' );
-var result = buble.transform( source ); // { code: ..., map: ... }
-'''
-
-
-## License
-
-MIT
-...
 ```
 
 
